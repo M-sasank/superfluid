@@ -14,8 +14,6 @@ import { ethers } from "ethers";
 let account;
 //where the Superfluid logic takes place
 
-console.log("hi","https://celo-mainnet.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
-
 export const CreateFlow = () => {
   const [f,setf]=useState("")
   const [recipient, setRecipient] = useState("");
@@ -25,63 +23,96 @@ export const CreateFlow = () => {
   const [currentAccount, setCurrentAccount] = useState("");
 
 
-  async function getNewFlow(recipient, flowRate) {
-
-    const provider = new ethers.providers.JsonRpcProvider("https://celo-mainnet.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
-    console.log("provider: ",provider);
-      // await provider.send("eth_requestAccounts", []);
-      const wallet = new ethers.Wallet(
-        "cf2bea4c6aad8dbc387d5dd68bf408999b0b1ee949e04ff1d96dd60bc3553a49",
-        provider
-      );
-      
-      const sf = await Framework.create({
-        chainId: 42220 , //your chainId here
-        provider,
-      });
-      const signer = sf.createSigner({ signer: wallet });
-      // console.log(provider.getCode(address));
-      console.log(signer);
-      const daix = await sf.loadSuperToken("0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A");
-    
-      console.log(daix);
-    
-      console.log("recipient is:",recipient);
-    let res = await daix.getNetFlow({
-      account: await signer.getAddress(),
-      providerOrSigner: signer
+  async function getNetFlow() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+  
+    const signer = provider.getSigner();
+  
+    const chainId = await window.ethereum.request({ method: "eth_chainId" });
+    const sf = await Framework.create({
+      chainId: Number(chainId),
+      provider: provider
     });
-    console.log(res);
+  
+    const superSigner = sf.createSigner({ signer: signer });
+  
+    console.log(signer);
+    console.log(await superSigner.getAddress());
+    const daix = await sf.loadSuperToken("fUSDCx");
+  
+    console.log(daix);
+    // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
+    // console.log("provider: ",provider);
+    //   // await provider.send("eth_requestAccounts", []);
+    //   const wallet = new ethers.Wallet(
+    //     "cf2bea4c6aad8dbc387d5dd68bf408999b0b1ee949e04ff1d96dd60bc3553a49",
+    //     provider
+    //   );
+      
+    //   const sf = await Framework.create({
+    //     chainId: 80001 , //your chainId here
+    //     provider,
+    //   });
+    //   const signer = sf.createSigner({ signer: wallet });
+    //   // console.log(provider.getCode(address));
+    //   console.log(signer);
+    //   const daix = await sf.loadSuperToken("fUSDCx");
+    //   console.log(daix);
+    //   console.log("recipient is:",recipient);
+    let res = await daix.getNetFlow({
+      account: await superSigner.getAddress(),
+      providerOrSigner: superSigner
+    });
+    console.log("The net flow is: "+ String(res)+" wei/sec");
     setf(res.toString())
   }
 
   async function createNewFlow(recipient, flowRate) {
-    const provider = new ethers.providers.JsonRpcProvider("https://celo-mainnet.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
-    console.log("provider: ",provider);
-      // await provider.send("eth_requestAccounts", []);
-      const wallet = new ethers.Wallet(
-        "cf2bea4c6aad8dbc387d5dd68bf408999b0b1ee949e04ff1d96dd60bc3553a49",
-        provider
-      );
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+  
+    const signer = provider.getSigner();
+  
+    const chainId = await window.ethereum.request({ method: "eth_chainId" });
+    const sf = await Framework.create({
+      chainId: Number(chainId),
+      provider: provider
+    });
+  
+    const superSigner = sf.createSigner({ signer: signer });
+  
+    console.log(signer);
+    console.log(await superSigner.getAddress());
+    const daix = await sf.loadSuperToken("fUSDCx");
+  
+    console.log(daix);
+    // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
+    // console.log("provider: ",provider);
+    //   // await provider.send("eth_requestAccounts", []);
+    //   const wallet = new ethers.Wallet(
+    //     "cf2bea4c6aad8dbc387d5dd68bf408999b0b1ee949e04ff1d96dd60bc3553a49",
+    //     provider
+    //   );
       
-      const sf = await Framework.create({
-        chainId: 42220, //your chainId here
-        provider,
-      });
+    //   const sf = await Framework.create({
+    //     chainId: 80001, //your chainId here
+    //     provider,
+    //   });
     
-      const signer = sf.createSigner({ signer: wallet });
+    //   const signer = sf.createSigner({ signer: wallet });
     
-      console.log(signer);
-      console.log(await signer.getAddress());
-      const daix = await sf.loadSuperToken("0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A");
+    //   console.log(signer);
+    //   console.log(await signer.getAddress());
+    //   const daix = await sf.loadSuperToken("0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f");
     
-      console.log(daix);
+    //   console.log(daix);
   
       try {
         const createFlowOperation = daix.createFlow({
-          sender: await signer.getAddress(),
+          sender: await superSigner.getAddress(),
           receiver: recipient,
-          flowRate: "1"
+          flowRate: flowRate
         });
     
         console.log(createFlowOperation);
@@ -315,6 +346,17 @@ export const CreateFlow = () => {
         <CreateButton
           onClick={() => {
             setIsButtonLoading(true);
+            getNetFlow();
+            setTimeout(() => {
+              setIsButtonLoading(false);
+            }, 1000);
+          }}
+        >
+          Click to get net flow of your Stream
+        </CreateButton>
+        <CreateButton
+          onClick={() => {
+            setIsButtonLoading(true);
             createNewFlow(recipient, flowRate);
             setTimeout(() => {
               setIsButtonLoading(false);
@@ -322,6 +364,28 @@ export const CreateFlow = () => {
           }}
         >
           Click to Create Your Stream
+        </CreateButton>
+        <CreateButton
+          onClick={() => {
+            setIsButtonLoading(true);
+            deleteExistingFlow(recipient, flowRate);
+            setTimeout(() => {
+              setIsButtonLoading(false);
+            }, 1000);
+          }}
+        >
+          Click to Delete a Stream
+        </CreateButton>
+        <CreateButton
+          onClick={() => {
+            setIsButtonLoading(true);
+            updateExistingFlow(recipient, flowRate);
+            setTimeout(() => {
+              setIsButtonLoading(false);
+            }, 1000);
+          }}
+        >
+          Click to Update a Stream
         </CreateButton>
       </Form>
 
