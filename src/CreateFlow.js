@@ -10,13 +10,11 @@ import {
 } from "react-bootstrap";
 import "./createFlow.css";
 import { ethers } from "ethers";
-import dotenv from 'dotenv';
-// Load environment variables
-dotenv.config();
 
 let account;
 //where the Superfluid logic takes place
 
+console.log("hi","https://celo-mainnet.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
 
 export const CreateFlow = () => {
   const [f,setf]=useState("")
@@ -29,7 +27,7 @@ export const CreateFlow = () => {
 
   async function getNewFlow(recipient, flowRate) {
 
-    const provider = new ethers.providers.JsonRpcProvider(process.env.INFURA_URL);
+    const provider = new ethers.providers.JsonRpcProvider("https://celo-mainnet.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
     console.log("provider: ",provider);
       // await provider.send("eth_requestAccounts", []);
       const wallet = new ethers.Wallet(
@@ -44,7 +42,7 @@ export const CreateFlow = () => {
       const signer = sf.createSigner({ signer: wallet });
       // console.log(provider.getCode(address));
       console.log(signer);
-      const daix = await sf.loadSuperToken(process.env.GOOD_DOLLAR);
+      const daix = await sf.loadSuperToken("0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A");
     
       console.log(daix);
     
@@ -58,7 +56,7 @@ export const CreateFlow = () => {
   }
 
   async function createNewFlow(recipient, flowRate) {
-    const provider = new ethers.providers.JsonRpcProvider(process.env.INFURA_URL);
+    const provider = new ethers.providers.JsonRpcProvider("https://celo-mainnet.infura.io/v3/e3aec91d6f8948e2bb78ca2b1986fb0e");
     console.log("provider: ",provider);
       // await provider.send("eth_requestAccounts", []);
       const wallet = new ethers.Wallet(
@@ -75,7 +73,7 @@ export const CreateFlow = () => {
     
       console.log(signer);
       console.log(await signer.getAddress());
-      const daix = await sf.loadSuperToken(process.env.GOOD_DOLLAR);
+      const daix = await sf.loadSuperToken("0x62B8B11039FcfE5aB0C56E502b1C372A3d2a9c7A");
     
       console.log(daix);
   
